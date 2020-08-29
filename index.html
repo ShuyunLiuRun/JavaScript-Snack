@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Page Title</title>
+
+<style>
+    .map{
+        width: 800px;
+        height: 800px;
+        background-color: #ccc;
+        position: relative;
+    }
+</style>
+</head>
+<body>
+    <div class="map"></div>
+<script>
+    //generate random numbers
+    (function (window){
+        function Random(){}
+        Random.prototype.getRan = function(min, max){
+            return (Math.floor(Math.random()*(max - min) + min));
+        };
+        window.Random = new Random();
+    }) (window);
+
+    //generate cubes
+    (function (win){
+        var map = document.querySelector(".map");
+
+        // Food constructor
+        function Food(width, height, color){
+            this.height = height||20;
+            this.width = width||20;
+            this.color = color;
+            this.x = 0;
+            this.y = 0;
+            this.element = document.createElement("div"); //for a cube
+        }
+
+        //init cube's style and location
+        Food.prototype.init = function(map){
+            //set style to the cube
+            var div = this.element;
+            div.style.position = "absolute";
+            div.style.width = this.width+"px";
+            div.style.height = this.height+"px";
+            div.style.backgroundColor = this.color;
+            //add cube to map
+            map.appendChild(div);
+            this.render(map);
+        };
+        //generate location
+        Food.prototype.render = function(map){
+            var x = Random.getRan(0, map.offsetWidth/this.width) * this.width;
+            var y = Random.getRan(0, map.offsetHeight/this.height)*this.height;
+            this.x = x;
+            this.y = y;
+            var div = this.element;
+            div.style.left = this.x +"px";
+            div.style.top = this.y +"px";
+        }
+    
+        var fd = new Food(20,20,"green");
+        fd.init(map);
+        console.log(this.x + this.y);
+    
+    })(window);
+
+</script>
+</body>
+</html>
