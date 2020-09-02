@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Page Title</title>
+<title>Snake</title>
 
 <style>
     .map{
@@ -27,6 +27,8 @@
     //generate cubes
     (function (win){
         var map = document.querySelector(".map");
+        //array to store all "food"s
+        var foods = [];
 
         // Food constructor
         function Food(width, height, color){
@@ -49,6 +51,8 @@
             //add cube to map
             map.appendChild(div);
             this.render(map);
+            //record this food so we can delete it if the sanke eat it
+            foods.push(div);
         };
         //generate location
         Food.prototype.render = function(map){
@@ -61,12 +65,11 @@
             div.style.top = this.y +"px";
         }
     
-        var fd = new Food(20,20,"green");
-        fd.init(map);
-        console.log(this.x + this.y);
-    
+        win.Food = Food;
     })(window);
-
+    var fd = new Food(20,20,"green");
+        fd.init(document.querySelector(".map"));
+        console.log(this.x + this.y);
 </script>
 </body>
 </html>
