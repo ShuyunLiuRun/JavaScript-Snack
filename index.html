@@ -1,182 +1,210 @@
 <!DOCTYPE html>
 <html>
-<head>
-<title>Snake</title>
 
-<style>
-    .map{
-        width: 800px;
-        height: 800px;
-        background-color: #ccc;
-        position: relative;
-    }
-</style>
+<head>
+    <title>Snake</title>
+
+    <style>
+        .map {
+            width: 800px;
+            height: 800px;
+            background-color: #ccc;
+            position: relative;
+        }
+    </style>
 </head>
+
 <body>
     <div class="map"></div>
-<script>
-    //generate random numbers
-    (function (window){
-        function Random(){}
-        Random.prototype.getRan = function(min, max){
-            return (Math.floor(Math.random()*(max - min) + min));
-        };
-        window.Random = new Random();
-    }) (window);
+    <script>
+        //generate random numbers
+        (function (window) {
+            function Random() { }
+            Random.prototype.getRan = function (min, max) {
+                return (Math.floor(Math.random() * (max - min) + min));
+            };
+            window.Random = new Random();
+        })(window);
 
-    //anonymous function for food (a cube in the map)
-    (function (win){
-        var map = document.querySelector(".map");
-        //array to store all "food"s
-        var foods = [];
+        //anonymous function for food (a cube in the map)
+        (function (window) {
+            var map = document.querySelector(".map");
+            //array to store all "food"s
+            var foods = [];
 
-        // Food constructor
-        function Food(width, height, color){
-            this.height = height||20;
-            this.width = width||20;
-            this.color = color;
-            this.x = 0;
-            this.y = 0;
-            this.element = document.createElement("div"); //for a cube
-        }
+            // Food constructor
+            function Food(width, height, color) {
+                this.height = height || 20;
+                this.width = width || 20;
+                this.color = color;
+                this.x = 0;
+                this.y = 0;
+                this.element = document.createElement("div"); //for a cube
+            }
 
-        //init cube's style and location
-        Food.prototype.init = function(map){
-            //first of all, delete the last 'food' before creating a new one
-            remove();
+            //init cube's style and location
+            Food.prototype.init = function (map) {
+                //first of all, delete the last 'food' before creating a new one
+                remove();
 
-            //set style to the cube
-            var div = this.element;
-            div.style.position = "absolute";
-            div.style.width = this.width+"px";
-            div.style.height = this.height+"px";
-            div.style.backgroundColor = this.color;
-            //add cube to map
-            map.appendChild(div);
-            this.render(map);
-            //record this food so we can delete it if the sanke eat it
-            foods.push(div);
-        };
-        
-        //generate location
-        Food.prototype.render = function(map){
-            var x = Random.getRan(0, map.offsetWidth/this.width) * this.width;
-            var y = Random.getRan(0, map.offsetHeight/this.height)*this.height;
-            this.x = x;
-            this.y = y;
-            var div = this.element;
-            div.style.left = this.x +"px";
-            div.style.top = this.y +"px";
-        }
-    
-        //private function -- delete food 
-        //this function cannot be accessed elsewhere because we don't want someone delete all the data accidently, so it is not write in prototype
-        function remove(){
-            foods.forEach(food => {
-                food.parentNode.removeChild(food);
-            });
-            foods = [];
-        }
-        win.Food = Food;
-    })(window);
-
-    //anonymous function for snake body
-    (function (window){
-        var elements = []; //store snake body parts
-        //constructor for snake
-        function Snake(width,height,direction){
-            this.width = width || 20;
-            this.height = height || 20;
-            //snake body
-            this.body=[
-                {x:3,y:2,color:"red"},// snake head
-                {x:2,y:2,color:"orange"}, // snake shoulder
-                {x:1,y:2,color:"orange"} // snake tail
-            ]
-            //direction
-            this.direction = direction || "right";
-        }
-
-        //init snake
-        Snake.prototype.init = function (map){
-            //remove the previous snake
-            remove();
-
-            for(var i = 0; i<this.body.length; i++){
-                //数组中的每个元素都是对象
-                var obj = this.body[i];
-                //create a div
-                var div = document.createElement('div');
-                //append the div to map
+                //set style to the cube
+                var div = this.element;
+                div.style.position = "absolute";
+                div.style.width = this.width + "px";
+                div.style.height = this.height + "px";
+                div.style.backgroundColor = this.color;
+                //add cube to map
                 map.appendChild(div);
-                div.style.width = this.width+'px';
-                div.style.height = this.height+'px';
-                div.style.position = 'absolute';
-                //横纵坐标
-                div.style.left = obj.x*this.width+'px';
-                div.style.top = obj.y*this.height+'px';
-                //背景颜色
-                div.style.backgroundColor = obj.color;
-                //put div into elements array --- for deleting it
-                elements.push(div);
-            }
-        }
+                this.render(map);
+                //record this food so we can delete it if the sanke eat it
+                foods.push(div);
+            };
 
-        //move the snake
-        Snake.prototype.move = function(food,map){
-            var i = this.body.length-1;
-            for(; i>0; i--){
-                this.body[i].x = this.body[i-1].x;
-                this.body[i].y = this.body[i-1].y;
+            //generate location
+            Food.prototype.render = function (map) {
+                var x = Random.getRan(0, map.offsetWidth / this.width) * this.width;
+                var y = Random.getRan(0, map.offsetHeight / this.height) * this.height;
+                this.x = x;
+                this.y = y;
+                var div = this.element;
+                div.style.left = this.x + "px";
+                div.style.top = this.y + "px";
             }
-            //change snake head direction
-            switch (this.direction){
-                case "right": 
-                    this.body[0].x+=1;
-                    break;
-                case "bottom":
-                    this.body[0].x+=1;
-                    break;
-                case "top": 
-                    this.body[0].x-=1;
-                    break;
-                case "left": 
-                    this.body[0].x-=1;
-                    break;
-                
+
+            //private function -- delete food 
+            //this function cannot be accessed elsewhere because we don't want someone delete all the data accidently, so it is not write in prototype
+            function remove() {
+                foods.forEach(food => {
+                    food.parentNode.removeChild(food);
+                });
+                foods = [];
             }
-        }
+            window.Food = Food;
+        })(window);
 
-        //delete the previous snake
-        function remove(){
-            var i = elements.length -1;
-            for (; i>=0; i--){
-                var ele = elements[i];
-                //remove it from the map
-                ele.parentNode.removeChild(ele);
-                elements.splice(i,1);
+        //anonymous function for snake body
+        (function (window) {
+            var elements = []; //store snake body parts
+            //constructor for snake
+            function Snake(width, height, direction) {
+                this.width = width || 20;
+                this.height = height || 20;
+                //snake body
+                this.body = [
+                    { x: 3, y: 2, color: "red" },// snake head
+                    { x: 2, y: 2, color: "orange" }, // snake shoulder
+                    { x: 1, y: 2, color: "orange" } // snake tail
+                ]
+                //direction
+                this.direction = direction || "right";
             }
-        };
 
-        // expose the snake to window so it could be accessed from outside
-        window.Snake = Snake;
-    })(window);
+            //init snake
+            Snake.prototype.init = function (map) {
+                //remove the previous snake
+                remove();
 
-    //外部测试代码
-    //create a food
-    var fd = new Food(20,20,"green");
-        fd.init(document.querySelector(".map"));
+                for (var i = 0; i < this.body.length; i++) {
+                    //数组中的每个元素都是对象
+                    var obj = this.body[i];
+                    //create a div
+                    var div = document.createElement('div');
+                    //append the div to map
+                    map.appendChild(div);
+                    div.style.width = this.width + 'px';
+                    div.style.height = this.height + 'px';
+                    div.style.position = 'absolute';
+                    //横纵坐标
+                    div.style.left = obj.x * this.width + 'px';
+                    div.style.top = obj.y * this.height + 'px';
+                    //背景颜色
+                    div.style.backgroundColor = obj.color;
+                    //put div into elements array --- for deleting it
+                    elements.push(div);
+                }
+            }
+
+            //move the snake
+            Snake.prototype.move = function (food, map) {
+                var i = this.body.length - 1;
+                for (; i > 0; i--) {
+                    this.body[i].x = this.body[i - 1].x;
+                    this.body[i].y = this.body[i - 1].y;
+                }
+                //change snake head direction
+                switch (this.direction) {
+                    case "right":
+                        this.body[0].x += 1;
+                        break;
+                    case "bottom":
+                        this.body[0].x += 1;
+                        break;
+                    case "top":
+                        this.body[0].x -= 1;
+                        break;
+                    case "left":
+                        this.body[0].x -= 1;
+                        break;
+
+                }
+            }
+
+            //delete the previous snake
+            function remove() {
+                var i = elements.length - 1;
+                for (; i >= 0; i--) {
+                    var ele = elements[i];
+                    //remove it from the map
+                    ele.parentNode.removeChild(ele);
+                    elements.splice(i, 1);
+                }
+            };
+
+            // expose the snake to window so it could be accessed from outside
+            window.Snake = Snake;
+        })(window);
+
+        //anonymous function for game
+        (function (window) {
+            var that = null;
+            //game constructor
+            function Game(map) {
+                this.food = new Food(20,20,"green");
+                this.snake = new Snake();
+                this.map = map;
+                that = this;
+            }
+            Game.prototype.init = function () {
+                //initialize a game
+                //initialize a food when the game start
+                this.food.init(this.map);
+                // the initial snake when the game start
+                this.snake.init(this.map);
+                //make the snake move every 150 mc
+                setInterval(function () {
+                    that.snake.move(that.food, that.map);
+                    that.snake.init(that.map);
+                }, 150);
+            };
         
-    //create a snake
-    var snake = new Snake();
-    // the initial snake when you start the game
-    snake.init(document.querySelector(".map")); 
-    //make the snake move every 150 mc
-    setInterval(function(){
-        snake.move(fd,document.querySelector(".map"));
-        snake.init(document.querySelector(".map"));
-    }, 150);
+            window.Game = Game;
+        }(window));
 
-</script>
+        var gm = new Game(document.querySelector(".map"));
+        gm.init();
+
+        //外部测试代码
+        //create a food
+        // var fd = new Food(20, 20, "green");
+        // fd.init(document.querySelector(".map"));
+
+        // //create a snake
+        // var snake = new Snake();
+        // // the initial snake when you start the game
+        // snake.init(document.querySelector(".map"));
+
+
+    </script>
 </body>
+
 </html>
