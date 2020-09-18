@@ -24,7 +24,7 @@
         window.Random = new Random();
     }) (window);
 
-    //generate cubes
+    //anonymous function for food (a cube in the map)
     (function (win){
         var map = document.querySelector(".map");
         //array to store all "food"s
@@ -42,6 +42,9 @@
 
         //init cube's style and location
         Food.prototype.init = function(map){
+            //first of all, delete the last 'food' before creating a new one
+            remove();
+
             //set style to the cube
             var div = this.element;
             div.style.position = "absolute";
@@ -54,6 +57,7 @@
             //record this food so we can delete it if the sanke eat it
             foods.push(div);
         };
+        
         //generate location
         Food.prototype.render = function(map){
             var x = Random.getRan(0, map.offsetWidth/this.width) * this.width;
@@ -65,11 +69,70 @@
             div.style.top = this.y +"px";
         }
     
+        //private function -- delete food 
+        //this function cannot be accessed elsewhere because we don't want someone delete all the data accidently, so it is not write in prototype
+        function remove(){
+            foods.forEach(food => {
+                food.parentNode.removeChild(food);
+            });
+            foods = [];
+        }
         win.Food = Food;
     })(window);
+
+    //anonymous function for snake body
+    (function (window){
+        var elements = []; //store snake body parts
+        //constructor for snake
+        function Snake(width,height,direction){
+            this.width = width || 20;
+            this.height = height || 20;
+            //snake body
+            this.body=[
+                {x:3,y:2,color:"red"},// snake head
+                {x:2,y:2,color:"orange"}, // snake shoulder
+                {x:1,y:2,color:"orange"} // snake tail
+            ]
+            //direction
+            this.direction = direction || "right";
+        }
+
+        //init snake
+        Snake.prototype.init = function (map){
+            for(var i = 0; i<this.body.length; i++){
+                //数组中的每个元素都是对象
+                var obj = this.body[i];
+                //create a div
+                var div = document.createElement('div');
+                //append the div to map
+                map.appendChild(div);
+                div.style.width = this.width+'px';
+                div.style.height = this.height+'px';
+                div.style.position = 'absolute';
+                //横纵坐标
+                div.style.left = obj.x*this.width+'px';
+                div.style.top = obj.y*this.height+'px';
+                //背景颜色
+                div.style.backgroundColor = obj.color;
+
+
+                //put div into elements array --- for deleting it
+                elements.push(div);
+            }
+        }
+    
+        // expose the snake to window so it could be accessed from outside
+        window.Snake = Snake;
+    
+    })(window);
+
+    //外部测试代码
     var fd = new Food(20,20,"green");
         fd.init(document.querySelector(".map"));
-        console.log(this.x + this.y);
+        
+    //create a snake
+    var snake = new Snake();
+    snake.init(document.querySelector(".map"));
 </script>
 </body>
 </html>
