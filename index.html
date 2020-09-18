@@ -99,6 +99,9 @@
 
         //init snake
         Snake.prototype.init = function (map){
+            //remove the previous snake
+            remove();
+
             for(var i = 0; i<this.body.length; i++){
                 //数组中的每个元素都是对象
                 var obj = this.body[i];
@@ -114,25 +117,66 @@
                 div.style.top = obj.y*this.height+'px';
                 //背景颜色
                 div.style.backgroundColor = obj.color;
-
-
                 //put div into elements array --- for deleting it
                 elements.push(div);
             }
         }
-    
+
+        //move the snake
+        Snake.prototype.move = function(food,map){
+            var i = this.body.length-1;
+            for(; i>0; i--){
+                this.body[i].x = this.body[i-1].x;
+                this.body[i].y = this.body[i-1].y;
+            }
+            //change snake head direction
+            switch (this.direction){
+                case "right": 
+                    this.body[0].x+=1;
+                    break;
+                case "bottom":
+                    this.body[0].x+=1;
+                    break;
+                case "top": 
+                    this.body[0].x-=1;
+                    break;
+                case "left": 
+                    this.body[0].x-=1;
+                    break;
+                
+            }
+        }
+
+        //delete the previous snake
+        function remove(){
+            var i = elements.length -1;
+            for (; i>=0; i--){
+                var ele = elements[i];
+                //remove it from the map
+                ele.parentNode.removeChild(ele);
+                elements.splice(i,1);
+            }
+        };
+
         // expose the snake to window so it could be accessed from outside
         window.Snake = Snake;
-    
     })(window);
 
     //外部测试代码
+    //create a food
     var fd = new Food(20,20,"green");
         fd.init(document.querySelector(".map"));
         
     //create a snake
     var snake = new Snake();
-    snake.init(document.querySelector(".map"));
+    // the initial snake when you start the game
+    snake.init(document.querySelector(".map")); 
+    //make the snake move every 150 mc
+    setInterval(function(){
+        snake.move(fd,document.querySelector(".map"));
+        snake.init(document.querySelector(".map"));
+    }, 150);
+
 </script>
 </body>
 </html>
