@@ -147,6 +147,21 @@
                         this.body[0].x -= 1;
                         break;
                 };
+
+                //to eat the food  -- when snake head's position reach the food's position
+                var headX = this.body[0].x*this.width;
+                var headY = this.body[0].y*this.height;
+                if(headX === food.x && headY === food.y){
+                    //get the last tail of the snake and copy it to the snake
+                    var last = this.body[this.body.length-1];
+                    this.body.push({
+                        x: last.x,
+                        y:last.y,
+                        color: last.color
+                    });
+                    //generate a new food
+                    food.init(map);
+                }
             };
 
             //delete the previous snake
@@ -174,6 +189,7 @@
                 this.map = map;
                 that = this;
             }
+            
             Game.prototype.init = function () {
                 //initialize a game
                 //initialize a food when the game start
@@ -182,7 +198,7 @@
                 this.snake.init(this.map);
                 // call the method to run the snake
                 this.runSnake(this.food, this.map);
-
+                //add read key listener
                 this.bindKey();
             };
 
